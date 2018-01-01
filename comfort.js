@@ -29,6 +29,8 @@ module.exports = function(RED) {
         node.name = n.name;
         node.tempField = n.tempField || "payload.temperature";
         node.tempFieldType = n.tempFieldType || "msg";
+        node.mrtField = n.mrtField || "payload.mrt";
+        node.mrtFieldType = n.mrtFieldType || "msg";
         node.humidityField = n.humidityField || "payload.humidity";
         node.humidityFieldType = n.humidityFieldType || "msg";
         node.airspeedField = n.airspeedField || 0;
@@ -42,6 +44,7 @@ module.exports = function(RED) {
         node.on("input", function(msg) {
 
             var temp = RED.util.evaluateNodeProperty(node.tempField,node.tempFieldType,node,msg) * 1.0;
+            var mrt = RED.util.evaluateNodeProperty(node.mrtField,node.mrtFieldType,node,msg) * 1.0;
             var humidity = RED.util.evaluateNodeProperty(node.humidityField,node.humidityFieldType,node,msg) * 1.0;
             var airspeed = RED.util.evaluateNodeProperty(node.airspeedField,node.airspeedFieldType,node,msg) * 1.0;
             var metabolicRate = RED.util.evaluateNodeProperty(node.metabolicRateField,node.metabolicRateFieldType,node,msg) * 1.0;
@@ -50,9 +53,9 @@ module.exports = function(RED) {
             var comfort;
 
             if (node.airspeed <= 0.2) {
-                comfort = comf.pmv(temp, temp, airspeed, humidity, metabolicRate, clothingLevel, 0)
+                comfort = comf.pmv(temp, mrt, airspeed, humidity, metabolicRate, clothingLevel, 0)
             } else {
-                comfort = comf.pmvElevatedAirspeed(temp, temp, airspeed, humidity, metabolicRate, clothingLevel, 0)
+                comfort = comf.pmvElevatedAirspeed(temp, mrt, airspeed, humidity, metabolicRate, clothingLevel, 0)
             }
 
             if (node.comfortFieldType === 'msg') {
